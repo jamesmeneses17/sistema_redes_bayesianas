@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema Fútbol — Analizador Probabilístico</title>
+  <meta name="description" content="Analizador probabilístico de partidos de fútbol. Genera el JSON del prompt maestro a partir de datos reales, con EV, riesgo, confianza y validación §23.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header id="app-header">
+  <div class="header-inner">
+    <div class="brand">
+      <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="9"/><path d="M12 7l4 3-1.5 4.5h-5L8 10z"/>
+      </svg>
+      <h1>Sistema <span class="brand-accent">Fútbol</span></h1>
+    </div>
+    <nav id="main-nav">
+      <button class="nav-btn active" data-tab="datos">Datos</button>
+      <button class="nav-btn" data-tab="resultado">Resultado</button>
+    </nav>
+  </div>
+</header>
+
+<main id="app-main">
+
+  <!-- ============ DATOS ============ -->
+  <section class="tab-content active" id="tab-datos">
+    <div class="section-header">
+      <h2>Datos del partido</h2>
+      <p class="section-desc">
+        El motor sólo calcula con lo que escribas aquí. No completa huecos: si falta un dato,
+        el campo correspondiente sale como <code>null</code> y baja la calidad de los datos.
+        Mínimo imprescindible: goles a favor y en contra por partido de los dos equipos.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title">Cargar desde JSON</h3>
+      <p class="card-desc">Pega aquí un JSON estructurado para autocompletar los campos de encuentro, local, visitante y cuotas.</p>
+      <div class="field">
+        <textarea id="in-json-input" class="json-textarea" rows="15" spellcheck="false" placeholder='{ "encuentro": { "equipo_local": "..." }, ... }'>{
+  "encuentro": {
+    "equipo_local": "Getafe CF",
+    "equipo_visitante": "Celta de Vigo",
+    "competicion": "LaLiga",
+    "fecha": "07/09/2026",
+    "tipo_de_partido": "Liga",
+    "media_goles_competicion": 2.60,
+    "ventaja_localia": 1.10,
+    "promedios_globales": false
+  },
+  "local_en_casa": {
+    "partidos_muestra": 10,
+    "goles_a_favor": 1.10,
+    "goles_en_contra": 0.90,
+    "forma_puntos_ultimos_5": 6,
+    "impacto_bajas": 0,
+    "dias_descanso": 7
+  },
+  "visitante_fuera_de_casa": {
+    "partidos_muestra": 10,
+    "goles_a_favor": 1.20,
+    "goles_en_contra": 1.60,
+    "forma_puntos_ultimos_5": 5,
+    "impacto_bajas": 0,
+    "dias_descanso": 7
+  },
+  "cuotas": {
+    "resultado": {
+      "gana_local": 2.82,
+      "empate": 2.72,
+      "gana_visitante": 3.05
+    },
+    "doble_oportunidad": {
+      "1x": 1.40,
+      "x2": 1.45,
+      "12": 1.42
+    },
+    "goles": {
+      "over_0_5": 1.19,
+      "over_1_5": 1.78,
+      "over_2_5": 3.35,
+      "over_3_5": 6.80,
+      "under_1_5": 2.05,
+      "under_2_5": 1.33,
+      "under_3_5": 1.11
+    },
+    "ambos_marcan": {
+      "si": 2.47,
+      "no": 1.50
+    },
+    "goles_del_local": {
+      "mas_0_5": 1.57,
+      "mas_1_5": 3.60
+    },
+    "goles_del_visitante": {
+      "mas_0_5": 1.62,
+      "mas_1_5": 3.80
+    }
+  }
+}</textarea>
+      </div>
+      <div class="actions actions-tight">
+        <button class="btn" id="btn-cargar-json-input">Cargar JSON</button>
+        <span class="form-msg" id="json-input-msg"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title">Encuentro</h3>
+      <div class="grid grid-4">
+        <div class="field">
+          <label for="in-local">Equipo local</label>
+          <input type="text" id="in-local" placeholder="Nombre del local">
+        </div>
+        <div class="field">
+          <label for="in-visitante">Equipo visitante</label>
+          <input type="text" id="in-visitante" placeholder="Nombre del visitante">
+        </div>
+        <div class="field">
+          <label for="in-competicion">Competición</label>
+          <input type="text" id="in-competicion" placeholder="Liga o torneo">
+        </div>
+        <div class="field">
+          <label for="in-fecha">Fecha</label>
+          <input type="date" id="in-fecha">
+        </div>
+      </div>
+      <div class="grid grid-4">
+        <div class="field">
+          <label for="in-tipo">Tipo de partido</label>
+          <select id="in-tipo">
+            <option value="LIGA">Liga</option>
+            <option value="COPA">Copa o eliminatoria</option>
+          </select>
+          <span class="hint">La copa aumenta la incertidumbre asignada.</span>
+        </div>
+        <div class="field">
+          <label for="in-media-liga">Media de goles de la competición</label>
+          <input type="number" id="in-media-liga" step="0.01" min="0.5" max="6" placeholder="2.60">
+          <span class="hint">Vacío = se usa 2,60 como referencia y baja la calidad.</span>
+        </div>
+        <div class="field">
+          <label for="in-ventaja">Ventaja de localía</label>
+          <input type="number" id="in-ventaja" step="0.01" min="0.8" max="1.6" value="1.10" disabled>
+          <span class="hint">Sólo se aplica con promedios globales.</span>
+        </div>
+        <div class="field field-check">
+          <label class="check">
+            <input type="checkbox" id="in-globales">
+            <span>Los promedios son globales, no de casa/fuera</span>
+          </label>
+          <span class="hint">Actívalo si tus goles por partido no están separados por localía.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="card">
+        <h3 class="card-title">Local <span class="tag" id="tag-local">en casa</span></h3>
+        <div class="grid grid-3">
+          <div class="field">
+            <label for="l-pj">Partidos de la muestra</label>
+            <input type="number" id="l-pj" min="1" max="60" step="1" placeholder="10">
+          </div>
+          <div class="field">
+            <label for="l-gf">Goles a favor por partido</label>
+            <input type="number" id="l-gf" min="0" max="8" step="0.01" placeholder="1.70">
+          </div>
+          <div class="field">
+            <label for="l-gc">Goles en contra por partido</label>
+            <input type="number" id="l-gc" min="0" max="8" step="0.01" placeholder="0.90">
+          </div>
+          <div class="field">
+            <label for="l-forma">Forma: puntos últimos 5</label>
+            <input type="number" id="l-forma" min="0" max="15" step="1" placeholder="0 – 15">
+          </div>
+          <div class="field">
+            <label for="l-bajas">Impacto de bajas</label>
+            <input type="number" id="l-bajas" min="0" max="5" step="1" placeholder="0 – 5">
+          </div>
+          <div class="field">
+            <label for="l-descanso">Días de descanso</label>
+            <input type="number" id="l-descanso" min="0" max="30" step="1" placeholder="Días">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Visitante <span class="tag" id="tag-visitante">fuera de casa</span></h3>
+        <div class="grid grid-3">
+          <div class="field">
+            <label for="v-pj">Partidos de la muestra</label>
+            <input type="number" id="v-pj" min="1" max="60" step="1" placeholder="10">
+          </div>
+          <div class="field">
+            <label for="v-gf">Goles a favor por partido</label>
+            <input type="number" id="v-gf" min="0" max="8" step="0.01" placeholder="1.20">
+          </div>
+          <div class="field">
+            <label for="v-gc">Goles en contra por partido</label>
+            <input type="number" id="v-gc" min="0" max="8" step="0.01" placeholder="1.40">
+          </div>
+          <div class="field">
+            <label for="v-forma">Forma: puntos últimos 5</label>
+            <input type="number" id="v-forma" min="0" max="15" step="1" placeholder="0 – 15">
+          </div>
+          <div class="field">
+            <label for="v-bajas">Impacto de bajas</label>
+            <input type="number" id="v-bajas" min="0" max="5" step="1" placeholder="0 – 5">
+          </div>
+          <div class="field">
+            <label for="v-descanso">Días de descanso</label>
+            <input type="number" id="v-descanso" min="0" max="30" step="1" placeholder="Días">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title">Cuotas de la casa</h3>
+      <p class="card-desc">
+        Opcionales, pero sin cuota no hay EV ni comparación con el mercado. Anota también la casa y
+        la cuota de cierre en tu registro: la auditoría de agosto de 2026 mostró que sin cuota no se
+        puede calcular EV, ROI ni CLV.
+      </p>
+      <div id="grid-cuotas" class="odds-grid"></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="btn-analizar">Analizar partido</button>
+      <button class="btn" id="btn-ejemplo">Cargar datos de ejemplo</button>
+      <button class="btn btn-ghost" id="btn-limpiar">Limpiar</button>
+      <span class="form-msg" id="form-msg"></span>
+    </div>
+  </section>
+
+  <!-- ============ RESULTADO ============ -->
+  <section class="tab-content" id="tab-resultado">
+    <div id="resultado-vacio" class="empty-state">
+      Todavía no hay análisis. Rellena los datos y pulsa <strong>Analizar partido</strong>.
+    </div>
+    <div id="resultado-cuerpo" hidden>
+
+      <div class="section-header">
+        <h2 id="res-titulo"></h2>
+        <p class="section-desc" id="res-subtitulo"></p>
+      </div>
+
+      <div class="grid grid-3">
+        <div class="card kpi-card">
+          <span class="kpi-label">Goles esperados</span>
+          <span class="kpi-value" id="res-xg"></span>
+          <span class="kpi-foot" id="res-xg-detalle"></span>
+        </div>
+        <div class="card kpi-card">
+          <span class="kpi-label">Calidad de los datos</span>
+          <span class="kpi-value" id="res-calidad"></span>
+          <span class="kpi-foot" id="res-calidad-comentario"></span>
+        </div>
+        <div class="card kpi-card">
+          <span class="kpi-label">Validación §23</span>
+          <span class="kpi-value" id="res-validacion"></span>
+          <span class="kpi-foot" id="res-validacion-detalle"></span>
+        </div>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <h3 class="card-title">Resultado</h3>
+          <div id="res-1x2" class="bars"></div>
+        </div>
+        <div class="card">
+          <h3 class="card-title">Marcadores más probables</h3>
+          <div id="res-marcadores" class="scores"></div>
+          <p class="card-desc">El marcador exacto es orientativo: en la auditoría de agosto de 2026 acertó 1 de 10. No debe usarse como argumento para BTTS ni para Over/Under.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Pronósticos</h3>
+        <div class="grid grid-2" id="res-pronosticos"></div>
+        <div id="res-evitar" class="avoid-box"></div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Mercados</h3>
+        <div class="table-wrap">
+          <table class="tabla" id="tabla-mercados">
+            <thead>
+              <tr>
+                <th>Mercado</th>
+                <th class="num">Prob.</th>
+                <th class="num">Cuota</th>
+                <th class="num">Implícita</th>
+                <th class="num">Desviación</th>
+                <th class="num">EV</th>
+                <th>Riesgo</th>
+                <th class="num">Conf.</th>
+                <th>Valor</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <h3 class="card-title">Escenarios</h3>
+          <div id="res-escenarios"></div>
+        </div>
+        <div class="card">
+          <h3 class="card-title">Factores clave</h3>
+          <ul id="res-factores" class="lista"></ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Conclusión</h3>
+        <p id="res-conclusion" class="conclusion"></p>
+      </div>
+    </div>
+  </section>
+
+
+
+</main>
+
+<footer id="app-footer">
+  <p>
+    Estimaciones probabilísticas, nunca certezas. Un EV positivo sólo indica una diferencia
+    favorable entre la probabilidad estimada y la cuota, no un resultado asegurado.
+  </p>
+</footer>
+
+<script src="js/modelo.js"></script>
+<script src="js/reglas.js"></script>
+<script src="js/validador.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
