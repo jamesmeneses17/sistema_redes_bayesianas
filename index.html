@@ -23,6 +23,7 @@
     <nav id="main-nav">
       <button class="nav-btn active" data-tab="datos">Datos</button>
       <button class="nav-btn" data-tab="resultado">Resultado</button>
+      <button class="nav-btn" data-tab="historial">Historial</button>
     </nav>
   </div>
 </header>
@@ -329,7 +330,121 @@
     </div>
   </section>
 
-
+  <!-- ============ HISTORIAL ============ -->
+  <section class="tab-content" id="tab-historial">
+    <div class="card">
+      <h3 class="card-title">Historial de Pronósticos</h3>
+      <div class="table-wrap">
+        <table class="tabla tabla-historial">
+          <thead>
+            <tr>
+              <th>FECHA</th>
+              <th>PARTIDO</th>
+              <th>GEMINI</th>
+              <th>CHATGPT</th>
+              <th>CLAUDE</th>
+              <th>RESULTADO FINAL</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="muted">7/9/2026, 12:04:04</td>
+              <td><strong>Elche CF</strong> vs <strong>Real Sociedad</strong><br><span class="muted">LaLiga</span></td>
+              <td>
+                <div class="hist-pronostico">Under 3.5 goles (85%)</div>
+                <div class="hist-actions">
+                  <button class="btn-icon btn-check">✓</button>
+                  <button class="btn-icon btn-cross">✕</button>
+                </div>
+              </td>
+              <td>
+                <div class="hist-pronostico">Under 3.5 goles (85%)</div>
+                <div class="hist-actions">
+                  <button class="btn-icon btn-check">✓</button>
+                  <button class="btn-icon btn-cross">✕</button>
+                </div>
+              </td>
+              <td>
+                <div class="hist-pronostico">Over 0.5 goles (93%)</div>
+                <div class="hist-actions">
+                  <button class="btn-icon btn-check">✓</button>
+                  <button class="btn-icon btn-cross">✕</button>
+                </div>
+              </td>
+              <td>
+                <div class="hist-resultado">
+                  <input type="text" class="input-resultado" placeholder="Ej: 2-1">
+                  <button class="btn-resultado">OK</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="muted">7/9/2026, 11:59:52</td>
+              <td><strong>Getafe CF</strong> vs <strong>Celta de Vigo</strong><br><span class="muted">LaLiga</span></td>
+              <td>
+                <div class="hist-pronostico ok">Over 0.5 goles (88%)</div>
+                <div class="hist-actions">
+                  <button class="btn-icon btn-check" style="opacity: 1;">✓</button>
+                  <button class="btn-icon btn-cross">✕</button>
+                </div>
+              </td>
+              <td>
+                <div class="hist-pronostico ok">Over 0.5 goles (88%)</div>
+                <div class="hist-actions">
+                  <button class="btn-icon btn-check" style="opacity: 1;">✓</button>
+                  <button class="btn-icon btn-cross">✕</button>
+                </div>
+              </td>
+              <td>
+                <div class="hist-pronostico">Doble oportunidad X2 (77%)</div>
+                <div class="hist-actions">
+                  <button class="btn-icon btn-check" style="opacity: 1;">✓</button>
+                  <button class="btn-icon btn-cross">✕</button>
+                </div>
+              </td>
+              <td>
+                <div class="hist-resultado">
+                  <input type="text" class="input-resultado" placeholder="Ej: 2-1">
+                  <button class="btn-resultado">OK</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="muted">7/9/2026, 11:53:47</td>
+              <td><strong>Udinese</strong> vs <strong>Lazio</strong><br><span class="muted">Serie A</span></td>
+              <td>
+                <div class="hist-pronostico">Over 0.5 goles (92%)</div>
+                <div class="hist-actions">
+                  <button class="btn-icon btn-check" style="opacity: 1;">✓</button>
+                  <button class="btn-icon btn-cross">✕</button>
+                </div>
+              </td>
+              <td>
+                <div class="hist-pronostico">Doble oportunidad X2 (85%)</div>
+                <div class="hist-actions">
+                  <button class="btn-icon btn-check" style="opacity: 1;">✓</button>
+                  <button class="btn-icon btn-cross">✕</button>
+                </div>
+              </td>
+              <td>
+                <div class="hist-pronostico">Doble oportunidad X2 (81%)</div>
+                <div class="hist-actions">
+                  <button class="btn-icon btn-check" style="opacity: 1;">✓</button>
+                  <button class="btn-icon btn-cross">✕</button>
+                </div>
+              </td>
+              <td>
+                <div class="hist-resultado">
+                  <input type="text" class="input-resultado" placeholder="Ej: 2-1">
+                  <button class="btn-resultado">OK</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
 
 </main>
 

@@ -511,3 +511,44 @@ input:disabled { background: var(--bg-elevated); color: var(--text-muted); curso
   .grid-2, .grid-3, .grid-4 { grid-template-columns: minmax(0, 1fr); }
   .bar-row { grid-template-columns: 110px 1fr 60px; }
 }
+
+/* --- Historial --- */
+.tabla-historial th { text-align: left; }
+.tabla-historial td { vertical-align: top; padding-top: var(--space-md); padding-bottom: var(--space-md); }
+.hist-pronostico { font-size: var(--text-sm); font-weight: 500; margin-bottom: 6px; }
+.hist-pronostico.ok { color: var(--ok); }
+.hist-actions { display: flex; gap: 8px; }
+.btn-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  opacity: 0.5;
+}
+.btn-icon:hover { opacity: 1; transform: scale(1.05); }
+.btn-check { background: var(--ok-bg); color: var(--ok); }
+.btn-cross { background: var(--error-bg); color: var(--error); }
+.hist-resultado { display: flex; align-items: center; gap: var(--space-xs); }
+.input-resultado {
+  width: 70px !important;
+  text-align: center;
+  padding: 4px 6px !important;
+  border-radius: var(--radius-sm) !important;
+}
+.btn-resultado {
+  padding: 4px 8px;
+  font-size: var(--text-xs);
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-resultado:hover { background: var(--bg-hover); }
