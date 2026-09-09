@@ -5,9 +5,7 @@ Implementación del **Prompt Maestro: Analizador Probabilístico de Partidos de 
 El prompt describe un contrato de datos muy estricto para que una app de HTML/CSS/JavaScript
 consuma el análisis sin limpiar nada. Este repositorio contiene las dos mitades de ese contrato:
 
-1. **`PROMPT_MAESTRO.md`** — el prompt completo, listo para pegar como instrucción de sistema en
-   un modelo de lenguaje.
-2. **La aplicación** — un motor que realiza el análisis y cálculo probabilístico, a partir de los datos que tú introduces en la interfaz.
+1. **La aplicación** — un motor que realiza el análisis y cálculo probabilístico, a partir de los datos que tú introduces en la interfaz.
 
 La regla R1 del prompt («no inventar datos») es la razón de ser del motor: en lugar de pedirle a
 un modelo que estime probabilidades de memoria, el sistema las deriva de números que tú aportas.
